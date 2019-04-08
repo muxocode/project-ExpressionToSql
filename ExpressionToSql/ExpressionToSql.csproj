@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>ExpressionToSQL</RootNamespace>
+    <AssemblyName>ExpressionToSQL</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExpressionToSQL.common\ExpressionToSQL.common.csproj" />
+    <ProjectReference Include="..\ExpressionToSql.util\ExpressionToSql.util.csproj" />
+  </ItemGroup>
+
+</Project>

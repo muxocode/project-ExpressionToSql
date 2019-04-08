@@ -3,3 +3,11 @@
 ################################################################################
 
 /.vs/ExpressionToSql/v15
+/ExpresionToSql.common.test/bin/Debug/netcoreapp2.2
+/ExpresionToSql.common.test/obj
+/ExpressionToSql/bin/Debug/netstandard2.0
+/ExpressionToSql/obj
+/ExpressionToSQL.common/bin/Debug/netstandard2.0
+/ExpressionToSQL.common/obj
+/ExpressionToSql.util/bin/Debug/netstandard2.0
+/ExpressionToSql.util/obj
