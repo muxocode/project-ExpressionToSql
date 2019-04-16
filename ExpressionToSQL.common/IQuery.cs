@@ -9,8 +9,7 @@ namespace ExpressionToSQL.common
     /// </summary>
     public interface IQuery
     {
-        IQueryConfiguration Configuration { get; }
-        ISqlQuery<T> Query<T>(Expression<Func<T, bool>> Predicado);
-        IQuery Configure(IQueryConfiguration Configuration);
+        ISqlQuery<T> Query<T>(Expression<Func<T, bool>> expression=null);
+        IQuery Configure(bool? wihNoLock = null, bool? fieldsInclude = null, bool? propsInclude = null, string PrimaryKeyTable = null, string tableName = null);
     }
 }

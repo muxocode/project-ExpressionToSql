@@ -1,7 +1,9 @@
-﻿using ExpressionToSQL.common.attributes;
+﻿
+
+using ExpressionToSQL.common.attributes;
 using System;
 
-namespace ExpressionTExpressionUtil.common.test.clases
+namespace ExpresionToSql.util.test.clases
 {
     public class Persona
     {

@@ -1,6 +1,5 @@
 ﻿using ExpressionToSQL.common.configuration;
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace ExpressionToSQL.common
@@ -8,18 +7,13 @@ namespace ExpressionToSQL.common
     /// <summary>
     /// Interfaz de conversor de expresiones a SQL
     /// </summary>
-    public interface ISqlCommand<T>
+    public interface ISqlQueryOrdered<T>
     {
         IQueryConfiguration Configuration { get; }
+        string Fisrt();
 
-        string Insert(T entity);
+        string Select();
 
-        string Insert(T[] entities);
-
-        string Delete();
-
-        string Update(T entity);
-
-        string Update(IDictionary<string, string> valueFields);
+        string Select(int page, int registryNumber);
     }
 }

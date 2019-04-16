@@ -15,6 +15,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ExpressionToSql.util\ExpressionToSql.util.csproj" />
+    <ProjectReference Include="..\ExpressionToSql\ExpressionToSql.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SqlCommand\" />
+    <Folder Include="SqlParse\" />
   </ItemGroup>
 
 </Project>

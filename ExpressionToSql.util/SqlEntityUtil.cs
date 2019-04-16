@@ -16,7 +16,7 @@ namespace ExpressionToSQL.util
             public string value;
         }
 
-        public static Dictionary<string, string> GetKeysValues<T>(ICommandConfiguration Configuration, T Entidad)
+        public static IDictionary<string, string> GetKeysValues<T>(ICommandConfiguration Configuration, T Entidad)
         {
             if (Configuration == null)
             {
@@ -27,7 +27,7 @@ namespace ExpressionToSQL.util
 
             if (Configuration.PropsInclude.GetValueOrDefault())
             {
-                var props = Entidad.GetType().GetProperties()
+                var props = typeof(T).GetProperties()
                 .Where(c => c.GetCustomAttributes(typeof(NonQuerable), false).Count() == 0)
                 .Select(x => new SqlField() { name = x.Name, value = Entidad!=null ? SqlValueUtil.GetValue(x.GetValue(Entidad)) : null });
 
@@ -36,7 +36,7 @@ namespace ExpressionToSQL.util
 
             if (Configuration.FieldsInclude.GetValueOrDefault())
             {
-                var fields = Entidad.GetType().GetFields()
+                var fields = typeof(T).GetFields()
                 .Where(c => c.GetCustomAttributes(typeof(NonQuerable), false).Count() == 0)
                 .Select(x => new SqlField() { name = x.Name, value = Entidad != null ? SqlValueUtil.GetValue(x.GetValue(Entidad)) : null });
 
@@ -46,7 +46,7 @@ namespace ExpressionToSQL.util
 
             if (!Configuration.IncludeId.GetValueOrDefault())
                 aSqlFields = aSqlFields
-                    .Where(x => x.name.ToUpper() != Configuration.KeyTableDefault.ToUpper())
+                    .Where(x => x.name.ToUpper() != Configuration.PrimaryKeyTable.ToUpper())
                     .ToList();
 
             var Elementos = aSqlFields.ToDictionary(x => x.name, y => y.value);
@@ -54,12 +54,12 @@ namespace ExpressionToSQL.util
             return Elementos;
         }
 
-        public static List<string> GetKeys<T>(ICommandConfiguration Configuration)
+        public static IEnumerable<string> GetKeys<T>(ICommandConfiguration Configuration)
         {
             return GetKeysValues<T>(Configuration, default(T)).Keys.ToList();
         }
 
-        public static List<string> GetValues<T>(ICommandConfiguration Configuration, T Entidad)
+        public static IEnumerable<string> GetValues<T>(ICommandConfiguration Configuration, T Entidad)
         {
             return GetKeysValues<T>(Configuration, Entidad).Values.ToList();
         }

@@ -9,8 +9,7 @@ namespace ExpressionToSQL.common
     /// </summary>
     public interface ICommand
     {
-        ICommandConfiguration Configuration { get; }
-        ISqlCommand<T> Command<T>(Expression<Func<T, bool>> Predicado);
-        ICommand Configue(ICommandConfiguration CustomConfiguration);
+        ISqlCommand<T> Command<T>(Expression<Func<T, bool>> expression= null);
+        ICommand Configure(bool? includeId=null);
     }
 }

@@ -8,7 +8,7 @@ namespace ExpressionToSQL.common.configuration
     {
         bool? FieldsInclude { get; }
         bool? PropsInclude { get; }
-        string KeyTableDefault { get; }
+        string PrimaryKeyTable { get; }
         string TableName { get; }
     }
 }

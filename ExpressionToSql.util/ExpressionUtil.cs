@@ -11,6 +11,10 @@ namespace ExpressionToSQL.util
 {
     public static class ExpressionUtil
     {
+        public static String ToSqlSeleccion<T, TResult>(Expression<Func<T, TResult>> expression)
+        {
+            return (expression.Body as MemberExpression).Member.Name;
+        }
 
         public static String ToSql<T>(Expression<Func<T, bool>> expression)
         {

@@ -13,12 +13,15 @@ namespace ExpressionToSQL
 
         public bool? WihNoLock { get; set; } = true;
 
-        public string KeyTableDefault { get; set; } = "Id";
-
-        public string OrderBy { get; set; } = "Id";
+        public string PrimaryKeyTable { get; set; } = "Id";
 
         public bool? IncludeId { get; set; } = false;
 
         public string TableName { get; set; } = null;
+
+        internal SqlConfiguration Clone()
+        {
+            return this.MemberwiseClone() as SqlConfiguration;
+        }
     }
 }

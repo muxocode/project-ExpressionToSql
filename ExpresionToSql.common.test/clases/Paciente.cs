@@ -1,6 +1,7 @@
-﻿namespace ExpressionTExpressionUtil.common.test.clases
+﻿
+namespace ExpresionToSql.util.test.clases
 {
-    public class Paciente
+    public class Paciente: IdObject
     {
         public long Id { get; set; }
         public string Nombre { get; set; }

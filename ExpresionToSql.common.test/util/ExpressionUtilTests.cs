@@ -1,11 +1,11 @@
-using ExpressionTExpressionUtil.common.test.clases;
-using ExpressionToSQL.common;
+using ExpresionToSql.util.test.clases;
 using ExpressionToSQL.util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace ExpressionTExpressionUtil.common.test
 {
@@ -399,5 +399,38 @@ namespace ExpressionTExpressionUtil.common.test
             Assert.IsTrue(sResult == "Saldo = 30");
         }
 
+        [TestMethod]
+        public void ExpressionNames()
+        {
+            var sResult = ExpressionUtil.ToSqlSeleccion((Paciente x) => x.Id);
+            Assert.IsTrue(sResult == "Id");
+
+            sResult = ExpressionUtil.ToSqlSeleccion((Paciente x) => x.MayorEdad);
+            Assert.IsTrue(sResult == "MayorEdad");
+
+            sResult = ExpressionUtil.ToSqlSeleccion((Paciente x) => x.Nombre);
+            Assert.IsTrue(sResult == "Nombre");
+
+            sResult = ExpressionUtil.ToSqlSeleccion((Persona x) => x.Apellido1);
+            Assert.IsTrue(sResult == "Apellido1");
+
+            sResult = ExpressionUtil.ToSqlSeleccion((Persona x) => x.apellido2);
+            Assert.IsTrue(sResult == "apellido2");
+
+            sResult = ExpressionUtil.ToSqlSeleccion((Persona x) => x.edad);
+            Assert.IsTrue(sResult == "edad");
+
+            sResult = ExpressionUtil.ToSqlSeleccion((Persona x) => x.Fecha);
+            Assert.IsTrue(sResult == "Fecha");
+
+            sResult = ExpressionUtil.ToSqlSeleccion((Persona x) => x.Id);
+            Assert.IsTrue(sResult == "Id");
+
+            sResult = ExpressionUtil.ToSqlSeleccion((Persona x) => x.Nombre);
+            Assert.IsTrue(sResult == "Nombre");
+
+            sResult = ExpressionUtil.ToSqlSeleccion((Persona x) => x.Saldo);
+            Assert.IsTrue(sResult == "Saldo");
+        }
     }
 }

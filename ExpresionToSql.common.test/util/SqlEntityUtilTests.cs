@@ -1,4 +1,4 @@
-using ExpressionTExpressionUtil.common.test.clases;
+using ExpresionToSql.util.test.clases;
 using ExpressionToSQL.common.configuration;
 using ExpressionToSQL.util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -50,7 +50,7 @@ namespace ExpresionToSql.util.test
                 .Where(x => x.FieldsInclude == true)
                 .Where(x => x.PropsInclude == false)
                 .Where(x => x.TableName == "Persona")
-                .Where(x => x.KeyTableDefault == "Id")
+                .Where(x => x.PrimaryKeyTable == "Id")
                 .Where(x => x.IncludeId == true)
                 .First();
 
@@ -76,7 +76,7 @@ namespace ExpresionToSql.util.test
                 .Where(x => x.FieldsInclude == false)
                 .Where(x => x.PropsInclude == true)
                 .Where(x => x.TableName == "Persona")
-                .Where(x => x.KeyTableDefault == "Id")
+                .Where(x => x.PrimaryKeyTable == "Id")
                 .Where(x => x.IncludeId == true)
                 .First();
 
@@ -108,7 +108,7 @@ namespace ExpresionToSql.util.test
                 .Where(x => x.FieldsInclude == true)
                 .Where(x => x.PropsInclude == true)
                 .Where(x => x.TableName == "Persona")
-                .Where(x => x.KeyTableDefault == "Id")
+                .Where(x => x.PrimaryKeyTable == "Id")
                 .Where(x => x.IncludeId == true)
                 .First();
 
@@ -142,7 +142,7 @@ namespace ExpresionToSql.util.test
                 .Where(x => x.FieldsInclude == true)
                 .Where(x => x.PropsInclude == true)
                 .Where(x => x.TableName == "Persona")
-                .Where(x => x.KeyTableDefault == "Id")
+                .Where(x => x.PrimaryKeyTable == "Id")
                 .Where(x => x.IncludeId == false)
                 .First();
 
