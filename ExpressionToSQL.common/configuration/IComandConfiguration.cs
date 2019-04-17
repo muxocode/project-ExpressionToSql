@@ -6,6 +6,7 @@ namespace ExpressionToSQL.common.configuration
 {
     public interface ICommandConfiguration:IConfiguration
     {
-        bool? IncludeId { get; }
+        bool IncludeId { get; }
+        string PrimaryKeyTable { get; }
     }
 }

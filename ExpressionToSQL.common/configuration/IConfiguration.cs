@@ -6,9 +6,9 @@ namespace ExpressionToSQL.common.configuration
 {
     public interface IConfiguration
     {
-        bool? FieldsInclude { get; }
-        bool? PropsInclude { get; }
-        string PrimaryKeyTable { get; }
+        bool FieldsInclude { get; }
+        bool PropsInclude { get; }
         string TableName { get; }
+        string Schema { get; }
     }
 }

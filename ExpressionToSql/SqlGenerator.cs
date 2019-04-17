@@ -19,19 +19,43 @@ namespace ExpressionToSQL
         IQueryConfiguration ISqlCommand<T>.Configuration => Configuration;
 
         string Expression;
-        string Table
+        string TableQuery
         {
             get
             {
                 var table = this.Configuration.TableName;
-                if (this is ISqlQuery<T> && this.Configuration.WihNoLock.GetValueOrDefault())
+                if (this.Configuration.WihNoLock)
                 {
-                    return $"{table} WITH(NOLOCK)";
+                    table = $"{table} WITH(NOLOCK)";
+                }
+
+                if (this.Configuration.Schema != null)
+                {
+                    table = $"{this.Configuration.Schema}.{table}";
                 }
 
                 return table;
             }
         }
+        string TableCommand
+        {
+            get
+            {
+                var table = this.Configuration.TableName;
+
+                if (this.Configuration.Schema != null)
+                {
+                    table = $"{this.Configuration.Schema}.{table}";
+                }
+
+                return table;
+            }
+        }
+
+        IQueryConfiguration ISqlQueryGrouped<T>.Configuration => throw new NotImplementedException();
+
+        string Group;
+
         string Order;
 
         public SqlGenerator(SqlConfiguration configuration, Expression<Func<T, bool>> expression = null)
@@ -44,29 +68,29 @@ namespace ExpressionToSQL
 
         public string Count()
         {
-            return SqlStatementUtil.Select("COUNT(*)", this.Table, this.Expression);
+            return SqlStatementUtil.SelectGroup("COUNT(*)", this.TableQuery, this.Expression, this.Group);
         }
 
         public string Fisrt()
         {
-            return SqlStatementUtil.Select("TOP(1) *", this.Table, this.Expression, this.Order);
+            return SqlStatementUtil.Select("TOP(1) *", this.TableQuery, this.Expression, this.Order);
         }
 
         public string Max<TReturn>(Expression<Func<T, TReturn>> property)
         {
-            return SqlStatementUtil.Select($"MAX({ExpressionUtil.ToSqlSeleccion(property)})", this.Table, this.Expression);
+            return SqlStatementUtil.SelectGroup($"MAX({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.Expression, this.Group);
         }
 
         public string Min<TReturn>(Expression<Func<T, TReturn>> property)
         {
-            return SqlStatementUtil.Select($"MIN({ExpressionUtil.ToSqlSeleccion(property)})", this.Table, this.Expression);
+            return SqlStatementUtil.SelectGroup($"MIN({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.Expression, this.Group);
         }
 
         public string Select()
         {
             return SqlStatementUtil.Select(
                 string.Join(",", SqlEntityUtil.GetKeys<T>(this.Configuration)),
-                this.Table,
+                this.TableQuery,
                 this.Expression,
                 this.Order);
         }
@@ -75,7 +99,7 @@ namespace ExpressionToSQL
         {
             return SqlStatementUtil.Select(
                 string.Join(",", SqlEntityUtil.GetKeys<T>(this.Configuration)),
-                this.Table,
+                this.TableQuery,
                 this.Expression,
                 this.Configuration.PrimaryKeyTable,
                 page,
@@ -105,7 +129,7 @@ namespace ExpressionToSQL
             var value_keys = SqlEntityUtil.GetKeysValues(this.Configuration, entity);
 
             return SqlStatementUtil.Insert(
-                this.Table,
+                this.TableCommand,
                 string.Join(",", value_keys.Keys),
                 string.Join(",", value_keys.Values),
                 this.Configuration.PrimaryKeyTable);
@@ -113,7 +137,7 @@ namespace ExpressionToSQL
 
         public string Delete()
         {
-            return SqlStatementUtil.Delete(this.Table, this.Expression);
+            return SqlStatementUtil.Delete(this.TableCommand, this.Expression);
         }
 
         public string Update(T entity)
@@ -121,7 +145,7 @@ namespace ExpressionToSQL
             var value_keys = SqlEntityUtil.GetKeysValues(this.Configuration, entity);
 
             return SqlStatementUtil.Update(
-                this.Table,
+                this.TableCommand,
                 value_keys,
                 this.Expression
                 );
@@ -130,7 +154,7 @@ namespace ExpressionToSQL
         public string Update(IDictionary<string, string> valueFields)
         {
             return SqlStatementUtil.Update(
-                this.Table,
+                this.TableCommand,
                 valueFields,
                 this.Expression
                 );
@@ -143,10 +167,35 @@ namespace ExpressionToSQL
             var keys = string.Join(",", SqlEntityUtil.GetKeys<T>(this.Configuration));
 
             return SqlStatementUtil.Insert(
-                this.Table,
+                this.TableCommand,
                 keys,
                 values,
                 this.Configuration.PrimaryKeyTable);
+        }
+
+        public ISqlQueryGrouped<T> GroupBy<TReturn>(params Expression<Func<T, TReturn>>[] property)
+        {
+            if (property != null)
+            {
+                this.Group = ExpressionUtil.ToSqlSeleccion(property.First());
+
+                foreach (var prop in property.Skip(1))
+                {
+                    this.Group += $",{ExpressionUtil.ToSqlSeleccion(prop)}";
+                }
+            }
+
+            return this;
+        }
+
+        public string Sum<TReturn>(Expression<Func<T, TReturn>> property)
+        {
+            return SqlStatementUtil.SelectGroup($"SUM({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.Expression, this.Group);
+        }
+
+        public string Avg<TReturn>(Expression<Func<T, TReturn>> property)
+        {
+            return SqlStatementUtil.SelectGroup($"AVG({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.Expression, this.Group);
         }
     }
 }

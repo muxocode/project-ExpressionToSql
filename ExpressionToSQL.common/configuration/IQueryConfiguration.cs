@@ -6,6 +6,6 @@ namespace ExpressionToSQL.common.configuration
 {
     public interface IQueryConfiguration:IConfiguration
     {
-        bool? WihNoLock { get; }
+        bool WihNoLock { get; }
     }
 }

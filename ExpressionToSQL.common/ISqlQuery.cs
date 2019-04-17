@@ -8,15 +8,9 @@ namespace ExpressionToSQL.common
     /// <summary>
     /// Interfaz de conversor de expresiones a SQL
     /// </summary>
-    public interface ISqlQuery<T>: ISqlQueryOrdered<T>
+    public interface ISqlQuery<T>: ISqlQueryOrdered<T>, ISqlQueryGrouped<T>
     {
-
-        string Count();
-
-        string Max<TReturn>(Expression<Func<T, TReturn>> property);
-
-        string Min<TReturn>(Expression<Func<T, TReturn>> property);
-
         ISqlQueryOrdered<T> OrderBy<TReturn>(params Expression<Func<T, TReturn>>[] property);
+        ISqlQueryGrouped<T> GroupBy<TReturn>(params Expression<Func<T, TReturn>>[] property);
     }
 }

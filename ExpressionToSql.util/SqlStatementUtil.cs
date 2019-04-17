@@ -22,6 +22,15 @@ namespace ExpressionToSQL.util
             return sResult;
         }
 
+        public static string SelectGroup(string select, string table, string expression, string groupby = null)
+        {
+            string sResult = Select(select, table, expression);
+            if (groupby != null)
+                sResult = $"{sResult} GROUP BY {groupby}";
+
+            return sResult;
+        }
+
         public static string Select(string select, string table, string expression, string row_number_name, int page, int registers, string order = null)
         {
             return String.Format(@"WITH C AS

@@ -25,7 +25,7 @@ namespace ExpressionToSQL.util
 
             var aSqlFields = new List<SqlField>();
 
-            if (Configuration.PropsInclude.GetValueOrDefault())
+            if (Configuration.PropsInclude)
             {
                 var props = typeof(T).GetProperties()
                 .Where(c => c.GetCustomAttributes(typeof(NonQuerable), false).Count() == 0)
@@ -34,7 +34,7 @@ namespace ExpressionToSQL.util
                 aSqlFields.AddRange(props);
             }
 
-            if (Configuration.FieldsInclude.GetValueOrDefault())
+            if (Configuration.FieldsInclude)
             {
                 var fields = typeof(T).GetFields()
                 .Where(c => c.GetCustomAttributes(typeof(NonQuerable), false).Count() == 0)
@@ -44,7 +44,7 @@ namespace ExpressionToSQL.util
             }
 
 
-            if (!Configuration.IncludeId.GetValueOrDefault())
+            if (!Configuration.IncludeId)
                 aSqlFields = aSqlFields
                     .Where(x => x.name.ToUpper() != Configuration.PrimaryKeyTable.ToUpper())
                     .ToList();
@@ -68,7 +68,7 @@ namespace ExpressionToSQL.util
         {
             string sResult = Configuration.TableName;
 
-            if (Configuration.WihNoLock.GetValueOrDefault())
+            if (Configuration.WihNoLock)
             {
                 sResult = $"{sResult} WITH(NOLOCK)";
             }

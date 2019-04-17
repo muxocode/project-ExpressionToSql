@@ -11,3 +11,10 @@
 /ExpressionToSQL.common/obj
 /ExpressionToSql.util/bin/Debug/netstandard2.0
 /ExpressionToSql.util/obj
+/ExpressionToSql.common.test/bin/Debug/netstandard2.0
+/ExpressionToSql.common.test/obj
+/ExpressionToSql.sql.test/bin/Debug/netcoreapp2.2
+/ExpressionToSql.sql.test/obj/Debug/netcoreapp2.2
+/ExpressionToSql.unit.test/bin/Debug/netcoreapp2.2
+/ExpressionToSql.unit.test/obj
+/ExpressionToSql.sql.test/obj

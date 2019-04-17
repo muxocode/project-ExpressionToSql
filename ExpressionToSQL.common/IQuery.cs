@@ -10,6 +10,11 @@ namespace ExpressionToSQL.common
     public interface IQuery
     {
         ISqlQuery<T> Query<T>(Expression<Func<T, bool>> expression=null);
-        IQuery Configure(bool? wihNoLock = null, bool? fieldsInclude = null, bool? propsInclude = null, string PrimaryKeyTable = null, string tableName = null);
+        IQuery Configure(
+            bool wihNoLock,
+            bool? fieldsInclude = null,
+            bool? propsInclude = null,
+            string tableName = null,
+            string schema = null);
     }
 }
