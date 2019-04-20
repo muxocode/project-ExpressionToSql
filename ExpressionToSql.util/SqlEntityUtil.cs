@@ -16,7 +16,7 @@ namespace ExpressionToSQL.util
             public string value;
         }
 
-        public static IDictionary<string, string> GetKeysValues<T>(ICommandConfiguration Configuration, T Entidad)
+        public static IDictionary<string, string> GetKeysValues<T>(IClassConfiguration Configuration, ICommandConfiguration CommandConfiguration, T Entidad)
         {
             if (Configuration == null)
             {
@@ -43,44 +43,26 @@ namespace ExpressionToSQL.util
                 aSqlFields.AddRange(fields);
             }
 
-
-            if (!Configuration.IncludeId)
-                aSqlFields = aSqlFields
-                    .Where(x => x.name.ToUpper() != Configuration.PrimaryKeyTable.ToUpper())
-                    .ToList();
-
+            if (CommandConfiguration != null)
+            {
+                if (!CommandConfiguration.IncludeId)
+                    aSqlFields = aSqlFields
+                        .Where(x => x.name.ToUpper() != CommandConfiguration.PrimaryKeyTable.ToUpper())
+                        .ToList();
+            }
             var Elementos = aSqlFields.ToDictionary(x => x.name, y => y.value);
 
             return Elementos;
         }
 
-        public static IEnumerable<string> GetKeys<T>(ICommandConfiguration Configuration)
+        public static IEnumerable<string> GetKeys<T>(IClassConfiguration Configuration, ICommandConfiguration CommandConfiguration=null)
         {
-            return GetKeysValues<T>(Configuration, default(T)).Keys.ToList();
+            return GetKeysValues<T>(Configuration, CommandConfiguration, default(T)).Keys.ToList();
         }
 
-        public static IEnumerable<string> GetValues<T>(ICommandConfiguration Configuration, T Entidad)
+        public static IEnumerable<string> GetValues<T>(IClassConfiguration Configuration, ICommandConfiguration CommandConfiguration, T Entidad)
         {
-            return GetKeysValues<T>(Configuration, Entidad).Values.ToList();
-        }
-
-        public static string QueryTableNameSpace<T>(IQueryConfiguration Configuration)
-        {
-            string sResult = Configuration.TableName;
-
-            if (Configuration.WihNoLock)
-            {
-                sResult = $"{sResult} WITH(NOLOCK)";
-            }
-
-            return sResult;
-        }
-
-        public static string CommandTableNameSpace<T>(ICommandConfiguration Configuration)
-        {
-            string sResult = Configuration.TableName;
-
-            return sResult;
+            return GetKeysValues<T>(Configuration, CommandConfiguration, Entidad).Values.ToList();
         }
     }
 }

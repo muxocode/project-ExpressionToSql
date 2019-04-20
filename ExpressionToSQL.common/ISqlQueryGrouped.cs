@@ -9,7 +9,6 @@ namespace ExpressionToSQL.common
     /// </summary>
     public interface ISqlQueryGrouped<T>
     {
-        IQueryConfiguration Configuration { get; }
         string Count();
 
         string Max<TReturn>(Expression<Func<T, TReturn>> property);

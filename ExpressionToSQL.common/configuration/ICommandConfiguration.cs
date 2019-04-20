@@ -4,9 +4,8 @@ using System.Text;
 
 namespace ExpressionToSQL.common.configuration
 {
-    public interface ICommandConfiguration:IConfiguration
+    public interface ICommandConfiguration:ITableConfiguration
     {
         bool IncludeId { get; }
-        string PrimaryKeyTable { get; }
     }
 }

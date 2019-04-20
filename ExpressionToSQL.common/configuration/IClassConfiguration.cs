@@ -4,8 +4,9 @@ using System.Text;
 
 namespace ExpressionToSQL.common.configuration
 {
-    public interface IQueryConfiguration:IConfiguration
+    public interface IClassConfiguration
     {
-        bool WihNoLock { get; }
+        bool FieldsInclude { get; }
+        bool PropsInclude { get; }
     }
 }

@@ -4,11 +4,10 @@ using System.Text;
 
 namespace ExpressionToSQL.common.configuration
 {
-    public interface IConfiguration
+    public interface ITableConfiguration
     {
-        bool FieldsInclude { get; }
-        bool PropsInclude { get; }
         string TableName { get; }
         string Schema { get; }
+        string PrimaryKeyTable { get; }
     }
 }

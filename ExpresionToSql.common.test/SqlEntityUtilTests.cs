@@ -47,19 +47,22 @@ namespace ExpresionToSql.util.test
             // Arrange
             ICommandConfiguration Configuration = this.mockRepository
                 .Of<ICommandConfiguration>()
-                .Where(x => x.FieldsInclude == true)
-                .Where(x => x.PropsInclude == false)
                 .Where(x => x.TableName == "Persona")
                 .Where(x => x.PrimaryKeyTable == "Id")
                 .Where(x => x.IncludeId == true)
                 .First();
 
-           
+            IClassConfiguration ClassConfiguration = this.mockRepository
+                 .Of<IClassConfiguration>()
+                 .Where(x => x.FieldsInclude == true)
+                 .Where(x => x.PropsInclude == false)
+                 .First();
 
             Persona Entidad = GetPersona();
 
             // Act
             var result = SqlEntityUtil.GetKeysValues(
+                ClassConfiguration,
                 Configuration,
                 Entidad);
 
@@ -73,19 +76,22 @@ namespace ExpresionToSql.util.test
             // Arrange
             ICommandConfiguration Configuration = this.mockRepository
                 .Of<ICommandConfiguration>()
-                .Where(x => x.FieldsInclude == false)
-                .Where(x => x.PropsInclude == true)
                 .Where(x => x.TableName == "Persona")
                 .Where(x => x.PrimaryKeyTable == "Id")
                 .Where(x => x.IncludeId == true)
                 .First();
 
-
+            IClassConfiguration ClassConfiguration = this.mockRepository
+                 .Of<IClassConfiguration>()
+                 .Where(x => x.FieldsInclude == false)
+                 .Where(x => x.PropsInclude == true)
+                 .First();
 
             Persona Entidad = GetPersona();
 
             // Act
             var result = SqlEntityUtil.GetKeysValues(
+                ClassConfiguration,
                 Configuration,
                 Entidad);
 
@@ -105,19 +111,23 @@ namespace ExpresionToSql.util.test
             // Arrange
             ICommandConfiguration Configuration = this.mockRepository
                 .Of<ICommandConfiguration>()
-                .Where(x => x.FieldsInclude == true)
-                .Where(x => x.PropsInclude == true)
                 .Where(x => x.TableName == "Persona")
                 .Where(x => x.PrimaryKeyTable == "Id")
                 .Where(x => x.IncludeId == true)
                 .First();
 
+            IClassConfiguration ClassConfiguration = this.mockRepository
+                 .Of<IClassConfiguration>()
+                 .Where(x => x.FieldsInclude == true)
+                 .Where(x => x.PropsInclude == true)
+                 .First();
 
 
             Persona Entidad = GetPersona();
 
             // Act
             var result = SqlEntityUtil.GetKeysValues(
+                ClassConfiguration,
                 Configuration,
                 Entidad);
 
@@ -139,19 +149,22 @@ namespace ExpresionToSql.util.test
             // Arrange
             ICommandConfiguration Configuration = this.mockRepository
                 .Of<ICommandConfiguration>()
-                .Where(x => x.FieldsInclude == true)
-                .Where(x => x.PropsInclude == true)
                 .Where(x => x.TableName == "Persona")
                 .Where(x => x.PrimaryKeyTable == "Id")
                 .Where(x => x.IncludeId == false)
                 .First();
 
-
+            IClassConfiguration ClassConfiguration = this.mockRepository
+                  .Of<IClassConfiguration>()
+                  .Where(x => x.FieldsInclude == true)
+                  .Where(x => x.PropsInclude == true)
+                  .First();
 
             Persona Entidad = GetPersona();
 
             // Act
             var result = SqlEntityUtil.GetKeysValues(
+                ClassConfiguration,
                 Configuration,
                 Entidad);
 

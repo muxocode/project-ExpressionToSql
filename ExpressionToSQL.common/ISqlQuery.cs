@@ -10,6 +10,12 @@ namespace ExpressionToSQL.common
     /// </summary>
     public interface ISqlQuery<T>: ISqlQueryOrdered<T>, ISqlQueryGrouped<T>
     {
+        ITableConfiguration Configuration { get; }
+        ISqlQuery<T> Configure(
+            string primaryKeyTable = null,
+            string tableName = null,
+            string schema = null
+            );
         ISqlQueryOrdered<T> OrderBy<TReturn>(params Expression<Func<T, TReturn>>[] property);
         ISqlQueryGrouped<T> GroupBy<TReturn>(params Expression<Func<T, TReturn>>[] property);
     }

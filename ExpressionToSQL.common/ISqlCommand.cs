@@ -10,7 +10,14 @@ namespace ExpressionToSQL.common
     /// </summary>
     public interface ISqlCommand<T>
     {
-        IQueryConfiguration Configuration { get; }
+        ICommandConfiguration Configuration { get; }
+
+        ISqlCommand<T> Configure(
+            bool? includeId=null,
+            string primaryKeyTable = null,
+            string tableName = null,
+            string schema = null
+            );
 
         string Insert(T entity);
 

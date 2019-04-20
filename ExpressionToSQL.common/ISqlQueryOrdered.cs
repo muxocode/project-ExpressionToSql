@@ -9,7 +9,6 @@ namespace ExpressionToSQL.common
     /// </summary>
     public interface ISqlQueryOrdered<T>
     {
-        IQueryConfiguration Configuration { get; }
         string Fisrt();
 
         string Select();

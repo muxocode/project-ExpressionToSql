@@ -11,7 +11,6 @@ namespace ExpressionTExpressionUtil.test.Parse.basic
 
     public class SqlParseTest
     {
-        protected SqlConfiguration congiguration = new SqlConfiguration();
 
         [TestClass]
         public class SqlParsePaciente : SqlQueryBaseTest<Paciente, long, string>

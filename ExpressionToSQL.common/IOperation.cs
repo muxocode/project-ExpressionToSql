@@ -7,8 +7,9 @@ namespace ExpressionToSQL.common
     /// <summary>
     /// Interfaz de conversor de expresiones a SQL
     /// </summary>
-    public interface ICommand:IOperation<ICommand>
+    public interface IOperation<T>
     {
-        ISqlCommand<T> Command<T>(Expression<Func<T, bool>> expression= null);
+        IClassConfiguration ClassConfiguration { get; }
+        T Configure(bool? FieldsInclude=null,bool? PropsInclude=null);
     }
 }
