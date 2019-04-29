@@ -15,11 +15,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionToSql.util", "Exp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionToSql", "ExpressionToSql\ExpressionToSql.csproj", "{8D540E5D-13DE-45B9-AB2F-8E5159A08103}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToSql.unit.test", "ExpressionToSql.unit.test\ExpressionToSql.unit.test.csproj", "{072417B4-2F00-4B1A-A110-5F2AA87D9ED2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionToSql.unit.test", "ExpressionToSql.unit.test\ExpressionToSql.unit.test.csproj", "{072417B4-2F00-4B1A-A110-5F2AA87D9ED2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToSql.common.test", "ExpressionToSql.common.test\ExpressionToSql.common.test.csproj", "{DA74BE88-C835-4015-A12E-F7908E475452}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionToSql.common.test", "ExpressionToSql.common.test\ExpressionToSql.common.test.csproj", "{DA74BE88-C835-4015-A12E-F7908E475452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToSql.sql.test", "ExpressionToSql.sql.test\ExpressionToSql.sql.test.csproj", "{BDA84BE4-C6D9-4D2B-BF05-7BB47C4175D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionToSql.sql.test", "ExpressionToSql.sql.test\ExpressionToSql.sql.test.csproj", "{BDA84BE4-C6D9-4D2B-BF05-7BB47C4175D1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7884D55-5C96-49FF-8EBB-D06E6E85EFFC}"
+	ProjectSection(SolutionItems) = preProject
+		readme.md = readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
