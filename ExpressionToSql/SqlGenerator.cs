@@ -15,10 +15,11 @@ namespace ExpressionToSQL
     {
         protected SqlClassConfiguration ClassConfiguration { get; set; }
         public SqlCommandConfiguration<T> CommandConfiguration { get; set; }
-
+        internal ISqlConsultant SqlConsultant { get; set; }
+        
 
         string sExpression;
-        Expression<Func<T, bool>> eExpression;
+        List<Expression<Func<T, bool>>> eExpression;
         protected virtual string TableQuery
         {
             get
@@ -37,7 +38,7 @@ namespace ExpressionToSQL
         {
             get
             {
-                var table = this.CommandConfiguration.TableName;
+                var table = $"{this.CommandConfiguration.TableName}";
 
                 if (this.CommandConfiguration.Schema != null)
                 {
@@ -52,52 +53,59 @@ namespace ExpressionToSQL
 
         ICommandConfiguration ISqlCommand<T>.Configuration => CommandConfiguration;
 
-        string Group;
+        protected string Group;
 
-        string Order;
+        protected string Order;
 
-        public SqlGenerator(SqlClassConfiguration configuration, Expression<Func<T, bool>> expression = null, SqlCommandConfiguration<T> commandConfiguration = null)
+        string EmptyToNull(string text) => text != string.Empty ? text : null;
+
+        public SqlGenerator(ISqlConsultant sqlConsultant, SqlClassConfiguration configuration, Expression<Func<T, bool>>[] expression = null, SqlCommandConfiguration<T> commandConfiguration = null)
         {
+            this.SqlConsultant = sqlConsultant;
             this.ClassConfiguration = configuration;
             this.CommandConfiguration = commandConfiguration ?? new SqlCommandConfiguration<T>();
-            this.sExpression = expression?.ToSql<T>();
-            this.eExpression = expression;
+            this.sExpression = null;
+            if (expression != null)
+            {
+                this.sExpression = EmptyToNull(String.Join(" AND ", expression?.Where(x => x != null).Select(x => x.ToSql<T>())));
+            }
+            this.eExpression = expression?.ToList();
         }
 
 
         public string Count()
         {
-            return SqlStatementUtil.SelectGroup("COUNT(*)", this.TableQuery, this.sExpression, this.Group);
+            return SqlConsultant.SelectGroup("COUNT(*)", this.TableQuery, this.sExpression, this.Group);
         }
 
         public string Fisrt()
         {
-            return SqlStatementUtil.Select("TOP(1) *", this.TableQuery, this.sExpression, this.Order);
+            return SqlConsultant.Select("TOP(1) *", this.TableQuery, this.sExpression, this.Order);
         }
 
         public string Max<TReturn>(Expression<Func<T, TReturn>> property)
         {
-            return SqlStatementUtil.SelectGroup($"MAX({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.sExpression, this.Group);
+            return SqlConsultant.SelectGroup($"MAX({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.sExpression, this.Group);
         }
 
         public string Min<TReturn>(Expression<Func<T, TReturn>> property)
         {
-            return SqlStatementUtil.SelectGroup($"MIN({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.sExpression, this.Group);
+            return SqlConsultant.SelectGroup($"MIN({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.sExpression, this.Group);
         }
 
         public string Avg<TReturn>(Expression<Func<T, TReturn>> property)
         {
-            return SqlStatementUtil.SelectGroup($"AVG({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.sExpression, this.Group);
+            return SqlConsultant.SelectGroup($"AVG({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.sExpression, this.Group);
         }
 
         public string Sum<TReturn>(Expression<Func<T, TReturn>> property)
         {
-            return SqlStatementUtil.SelectGroup($"SUM({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.sExpression, this.Group);
+            return SqlConsultant.SelectGroup($"SUM({ExpressionUtil.ToSqlSeleccion(property)})", this.TableQuery, this.sExpression, this.Group);
         }
 
         public string Select()
         {
-            return SqlStatementUtil.Select(
+            return SqlConsultant.Select(
                 string.Join(",", SqlEntityUtil.GetKeys<T>(this.ClassConfiguration)),
                 this.TableQuery,
                 this.sExpression,
@@ -106,7 +114,7 @@ namespace ExpressionToSQL
 
         public string Select(int page, int registryNumber)
         {
-            return SqlStatementUtil.Select(
+            return SqlConsultant.Select(
                 string.Join(",", SqlEntityUtil.GetKeys<T>(this.ClassConfiguration, this.CommandConfiguration)),
                 this.TableQuery,
                 this.sExpression,
@@ -120,24 +128,27 @@ namespace ExpressionToSQL
 
         public ISqlQueryOrdered<T> OrderBy<TReturn>(params Expression<Func<T, TReturn>>[] property)
         {
+
+            string sOrder = String.Empty;
+
             if (property != null)
             {
-                this.Order = ExpressionUtil.ToSqlSeleccion(property.First());
+                sOrder = ExpressionUtil.ToSqlSeleccion(property.First());
 
                 foreach (var prop in property.Skip(1))
                 {
-                    this.Order += $",{ExpressionUtil.ToSqlSeleccion(prop)}";
+                    sOrder += $",{ExpressionUtil.ToSqlSeleccion(prop)}";
                 }
             }
 
-            return this;
+            return new SqlGenerator<T>(this.SqlConsultant,ClassConfiguration, eExpression?.ToArray(), this.CommandConfiguration) { Order = EmptyToNull(sOrder) };
         }
 
         public string Insert(T entity)
         {
             var value_keys = SqlEntityUtil.GetKeysValues(this.ClassConfiguration, this.CommandConfiguration, entity);
 
-            return SqlStatementUtil.Insert(
+            return SqlConsultant.Insert(
                 this.TableCommand,
                 string.Join(",", value_keys.Keys),
                 string.Join(",", value_keys.Values),
@@ -146,14 +157,14 @@ namespace ExpressionToSQL
 
         public string Delete()
         {
-            return SqlStatementUtil.Delete(this.TableCommand, this.sExpression);
+            return SqlConsultant.Delete(this.TableCommand, this.sExpression);
         }
 
         public string Update(T entity)
         {
             var value_keys = SqlEntityUtil.GetKeysValues(this.ClassConfiguration, this.CommandConfiguration, entity);
 
-            return SqlStatementUtil.Update(
+            return SqlConsultant.Update(
                 this.TableCommand,
                 value_keys,
                 this.sExpression
@@ -162,7 +173,7 @@ namespace ExpressionToSQL
 
         public string Update(IDictionary<string, string> valueFields)
         {
-            return SqlStatementUtil.Update(
+            return SqlConsultant.Update(
                 this.TableCommand,
                 valueFields,
                 this.sExpression
@@ -175,7 +186,7 @@ namespace ExpressionToSQL
 
             var keys = string.Join(",", SqlEntityUtil.GetKeys<T>(this.ClassConfiguration, this.CommandConfiguration));
 
-            return SqlStatementUtil.Insert(
+            return SqlConsultant.Insert(
                 this.TableCommand,
                 keys,
                 values,
@@ -184,17 +195,20 @@ namespace ExpressionToSQL
 
         public ISqlQueryGrouped<T> GroupBy<TReturn>(params Expression<Func<T, TReturn>>[] property)
         {
+
+            string sGroup = String.Empty;
+
             if (property != null)
             {
-                this.Group = ExpressionUtil.ToSqlSeleccion(property.First());
+                sGroup = ExpressionUtil.ToSqlSeleccion(property.First());
 
                 foreach (var prop in property.Skip(1))
                 {
-                    this.Group += $",{ExpressionUtil.ToSqlSeleccion(prop)}";
+                    sGroup += $",{ExpressionUtil.ToSqlSeleccion(prop)}";
                 }
             }
 
-            return this;
+            return new SqlGenerator<T>(this.SqlConsultant, ClassConfiguration, eExpression?.ToArray(), this.CommandConfiguration) { Group = EmptyToNull(sGroup) };
         }
 
         private SqlGenerator<T> Configure(bool? includeId, string primaryKeyTable, string tableName, string schema)
@@ -206,7 +220,7 @@ namespace ExpressionToSQL
             oConf.TableName = tableName ?? oConf.TableName;
             oConf.Schema = schema ?? oConf.Schema;
 
-            return new SqlGenerator<T>(ClassConfiguration, eExpression, oConf);
+            return new SqlGenerator<T>(this.SqlConsultant, ClassConfiguration, eExpression?.ToArray(), oConf);
 
         }
 
@@ -218,6 +232,24 @@ namespace ExpressionToSQL
         ISqlCommand<T> ISqlCommand<T>.Configure(bool? includeId, string primaryKeyTable, string tableName, string schema)
         {
             return Configure(includeId, primaryKeyTable, tableName, schema);
+        }
+
+        public ISqlQuery<T> Where(Expression<Func<T, bool>> expression)
+        {
+            var aLista = new List<Expression<Func<T, bool>>>();
+            aLista.AddRange((this.eExpression??new List<Expression<Func<T, bool>>>()).ToList());
+            aLista.Add(expression);
+
+            return new SqlGenerator<T>(this.SqlConsultant, this.ClassConfiguration, aLista.ToArray(), this.CommandConfiguration);
+        }
+
+        ISqlCommand<T> ISqlCommand<T>.Where(Expression<Func<T, bool>> expression)
+        {
+            var aLista = new List<Expression<Func<T, bool>>>();
+            aLista.AddRange((this.eExpression ?? new List<Expression<Func<T, bool>>>()).ToList());
+            aLista.Add(expression);
+
+            return new SqlGenerator<T>(this.SqlConsultant, this.ClassConfiguration, aLista.ToArray(), this.CommandConfiguration);
         }
     }
 }

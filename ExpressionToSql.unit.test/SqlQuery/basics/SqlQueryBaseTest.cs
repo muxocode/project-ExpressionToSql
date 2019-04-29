@@ -26,11 +26,11 @@ namespace ExpresionToSql.SqlQuery.basics.test
 
         private string table(SqlCommandConfiguration<T> configuration)
         {
-            var table = typeof(T).Name;
+            var table = $"{typeof(T).Name}";
 
             if (configuration.Schema != null)
             {
-                return $"{schema}.{typeof(T).Name}";
+                return $"{schema}.{table}";
             }
 
             return table;

@@ -1,4 +1,5 @@
-﻿using ExpressionToSQL.common.error;
+﻿using ExpressionToSQL.common;
+using ExpressionToSQL.common.error;
 using ExpressionToSQL.util.enums;
 using System;
 using System.Collections;
@@ -9,9 +10,9 @@ using System.Text;
 
 namespace ExpressionToSQL.util
 {
-    public static class SqlStatementUtil
+    public class SqlServerConsultant : ISqlConsultant
     {
-        public static string Select(string select, string table, string expression, string order = null)
+        public string Select(string select, string table, string expression, string order = null)
         {
             string sResult = String.Format($"SELECT {select} FROM {table}");
             if (expression != null)
@@ -22,7 +23,7 @@ namespace ExpressionToSQL.util
             return sResult;
         }
 
-        public static string SelectGroup(string select, string table, string expression, string groupby = null)
+        public string SelectGroup(string select, string table, string expression, string groupby = null)
         {
             string sResult = Select(select, table, expression);
             if (groupby != null)
@@ -31,7 +32,7 @@ namespace ExpressionToSQL.util
             return sResult;
         }
 
-        public static string Select(string select, string table, string expression, string row_number_name, int page, int registers, string order = null)
+        public string Select(string select, string table, string expression, string row_number_name, int page, int registers, string order = null)
         {
             return String.Format(@"WITH C AS
             ( 
@@ -53,7 +54,7 @@ namespace ExpressionToSQL.util
                 );
         }
 
-        public static string Insert(string table, string keys, string values, string keyTable)
+        public string Insert(string table, string keys, string values, string keyTable)
         {
             return string.Format("INSERT INTO {0} ({1}) OUTPUT inserted.{3} VALUES ({2})",
                                      table,
@@ -62,27 +63,30 @@ namespace ExpressionToSQL.util
                                      keyTable);
         }
 
-        public static string Insert(string table, string keys, IEnumerable<IEnumerable<string>> values, string keyTable)
+        public string Insert(string table, string keys, IEnumerable<IEnumerable<string>> values, string keyTable)
         {
-            string sResult = null;
+            string sResult = String.Empty; ;
+            string sAux = String.Empty;
 
-            foreach(var objectValues in values)
+
+            foreach (var objectValues in values.Reverse())
             {
-                var sAux = sResult!=null ? " UNION ALL " : "";
-                sResult += string.Format("SELECT {0} {1}", string.Join(",", objectValues), sAux);
+                sResult = $"{string.Format("SELECT {0} {1}", string.Join(",", objectValues), sAux)} {sResult}";
+                sAux = "UNION ALL";
             }
+
 
             sResult = string.Format("INSERT INTO {0} ({1}) OUTPUT Inserted.{3} {2}", table, string.Join(",", keys), sResult, keyTable);
 
             return sResult;
         }
 
-        public static string Delete(string table, string expression = null)
+        public string Delete(string table, string expression = null)
         {
             return string.Format("DELETE FROM {0}{1}", table, expression != null ? $" WHERE {expression}" : String.Empty);
         }
 
-        public static string Update(string table, IDictionary<string, string> FieldNameValues, string expression = null)
+        public string Update(string table, IDictionary<string, string> FieldNameValues, string expression = null)
         {
             string sResult;
             var Elementos = (from oObj in FieldNameValues
@@ -91,11 +95,11 @@ namespace ExpressionToSQL.util
 
             if (expression != null)
             {
-                sResult= string.Format("UPDATE {0} SET {1} WHERE {2}", table, string.Join(",", Elementos), expression);
+                sResult = string.Format("UPDATE {0} SET {1} WHERE {2}", table, string.Join(",", Elementos), expression);
             }
             else
             {
-                sResult= string.Format("UPDATE {0} SET {1}", table, string.Join(",", Elementos));
+                sResult = string.Format("UPDATE {0} SET {1}", table, string.Join(",", Elementos));
             }
 
             return sResult;

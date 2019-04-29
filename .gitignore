@@ -18,3 +18,5 @@
 /ExpressionToSql.unit.test/bin/Debug/netcoreapp2.2
 /ExpressionToSql.unit.test/obj
 /ExpressionToSql.sql.test/obj
+/ExpressionToSql.sql.test/sqlServer/db
+/.vs/ExpressionToSql/DesignTimeBuild

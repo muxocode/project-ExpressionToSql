@@ -18,5 +18,6 @@ namespace ExpressionToSQL.common
             );
         ISqlQueryOrdered<T> OrderBy<TReturn>(params Expression<Func<T, TReturn>>[] property);
         ISqlQueryGrouped<T> GroupBy<TReturn>(params Expression<Func<T, TReturn>>[] property);
+        ISqlQuery<T> Where(Expression<Func<T, bool>> expression);
     }
 }

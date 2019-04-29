@@ -28,5 +28,7 @@ namespace ExpressionToSQL.common
         string Update(T entity);
 
         string Update(IDictionary<string, string> valueFields);
+        ISqlCommand<T> Where(Expression<Func<T, bool>> expression);
+
     }
 }

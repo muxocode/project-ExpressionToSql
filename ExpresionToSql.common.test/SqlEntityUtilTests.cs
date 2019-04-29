@@ -42,7 +42,7 @@ namespace ExpresionToSql.util.test
         }
 
         [TestMethod]
-        public void GetFieds()
+        public void GetFields()
         {
             // Arrange
             ICommandConfiguration Configuration = this.mockRepository

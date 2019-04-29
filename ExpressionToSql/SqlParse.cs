@@ -5,6 +5,7 @@ using System.Linq;
 using ExpressionToSQL.common;
 using ExpressionToSQL.common.configuration;
 using ExpressionToSQL.configuration;
+using ExpressionToSQL.util;
 
 namespace ExpressionToSQL
 {
@@ -16,6 +17,8 @@ namespace ExpressionToSQL
 
         IClassConfiguration IOperation<ICommand>.ClassConfiguration => ClassConfiguration;
 
+        public ISqlConsultant SqlConsultant { get; set; } = new SqlServerConsultant();
+
         public SqlParse(SqlClassConfiguration configuration = null)
         {
             this.ClassConfiguration = configuration ?? new SqlClassConfiguration();
@@ -23,12 +26,12 @@ namespace ExpressionToSQL
 
         public ISqlCommand<T> Command<T>(Expression<Func<T, bool>> expression = null)
         {
-            return new SqlGenerator<T>(this.ClassConfiguration, expression);
+            return new SqlGenerator<T>(this.SqlConsultant,this.ClassConfiguration, expression != null ? new Expression<Func<T, bool>>[] { expression } : null);
         }
 
         public ISqlQuery<T> Query<T>(Expression<Func<T, bool>> expression = null)
         {
-            return new SqlGenerator<T>(this.ClassConfiguration, expression);
+            return new SqlGenerator<T>(this.SqlConsultant, this.ClassConfiguration, expression != null ? new Expression<Func<T, bool>>[] { expression } : null);
         }
 
         public SqlParse Configure(bool? fieldsInclude = null, bool? propsInclude = null)
