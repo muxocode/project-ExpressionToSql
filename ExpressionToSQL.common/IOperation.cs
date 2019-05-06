@@ -9,7 +9,6 @@ namespace ExpressionToSQL.common
     /// </summary>
     public interface IOperation<T>
     {
-        ISqlConsultant SqlConsultant { get; set; }
         IClassConfiguration ClassConfiguration { get; }
         T Configure(bool? FieldsInclude=null,bool? PropsInclude=null);
     }

@@ -24,7 +24,7 @@ namespace ExpresionToSql.SqlQuery.basics.test
         protected abstract string schema { get; }
 
 
-        private string table(SqlCommandConfiguration<T> configuration)
+        private string table(IQueryConfiguration configuration)
         {
             var table = $"{typeof(T).Name}";
 
@@ -36,10 +36,22 @@ namespace ExpresionToSql.SqlQuery.basics.test
             return table;
         }
 
-        private string predicate(SqlCommandConfiguration<T> configuration)
+        private string table(ICommandConfiguration configuration)
         {
-            //return configuration.WihNoLock ? " WITH(NOLOCK)" : "";
-            return null;
+            var table = $"{typeof(T).Name}";
+
+            if (configuration.Schema != null)
+            {
+                return $"{schema}.{table}";
+            }
+
+            return table;
+        }
+
+        private string predicate(IQueryConfiguration configuration=null)
+        {
+            return (configuration?.WithNoLock ?? false) ? " WITH(NOLOCK)" : "";
+            //return null;
         }
 
         private string stringExpression
@@ -68,30 +80,28 @@ namespace ExpresionToSql.SqlQuery.basics.test
             }
         }
 
-        private string selection(SqlClassConfiguration configuration)
+        private string selection(IClassConfiguration configuration, ICommandConfiguration commandConfiguration=null)
         {
             return
                 string.Join(",",
-                ExpressionToSQL.util.SqlEntityUtil.GetKeys<T>(configuration));
+                ExpressionToSQL.util.SqlEntityUtil.GetKeys<T>(configuration, commandConfiguration));
         }
 
-        private string finalQuery(SqlCommandConfiguration<T> commandConfiguration)
+        private string finalQuery(IQueryConfiguration configuration)
         {
-            return $"{table(commandConfiguration)}{predicate(commandConfiguration)}{stringExpression}";
+            return $"{table(configuration)}{predicate(configuration)}{stringExpression}";
         }
 
-        private void RunOperationTest(Action<SqlParse> check,  SqlClassConfiguration classConfiguration)
+        private void RunOperationTest(Action<SqlParse> check)
         {
-            SqlParse Parser = new SqlParse(classConfiguration);
-
+            SqlParse Parser = new SqlParse();
+            
             check(Parser);
 
-            var fieldsInclude = !classConfiguration.FieldsInclude;
-            classConfiguration.FieldsInclude = !fieldsInclude;
+            var fieldsInclude = !Parser.ClassConfiguration.FieldsInclude;
             check(Parser.Configure(fieldsInclude: !fieldsInclude));
 
-            var propsInclude = !classConfiguration.PropsInclude;
-            classConfiguration.PropsInclude = !propsInclude;
+            var propsInclude = !Parser.ClassConfiguration.PropsInclude;
             check(Parser.Configure(propsInclude: !propsInclude));
         }
 
@@ -99,166 +109,153 @@ namespace ExpresionToSql.SqlQuery.basics.test
         [TestMethod]
         public void Fisrt()
         {
-            var configuration = new SqlClassConfiguration();
-            var TableConfiguration = new SqlCommandConfiguration<T> { Schema = schema };
 
 
             Action<IQuery> check = query =>
             {
-                var text = query.Query<T>(expresion).Configure(schema:schema).OrderBy(GetOrder()).Fisrt();
-                Assert.IsTrue(text == $"SELECT TOP(1) * FROM {finalQuery(TableConfiguration)}{stringOrder}");
+                var oQuery = query.Query<T>(expresion).Configure(schema: schema);
+                var text = oQuery.OrderBy(GetOrder()).Fisrt();
+
+                Trace.WriteLine($"{text} vs SELECT TOP(1) * FROM { finalQuery(oQuery.Configuration)}{ stringOrder}");
+
+
+                Assert.IsTrue(text == $"SELECT TOP(1) * FROM {finalQuery(oQuery.Configuration)}{stringOrder}");
             };
 
-            RunOperationTest(check, configuration);
+            RunOperationTest(check);
         }
 
         [TestMethod]
         public void Count()
         {
-            var configuration = new SqlClassConfiguration();
-            var TableConfiguration = new SqlCommandConfiguration<T> { Schema = schema };
 
             Action<IQuery> check = Parser =>
             {
-                var sResult = Parser.Query<T>(expresion).Configure(schema: schema).GroupBy(GetGroup()).Count();
+                var oQuery = Parser.Query<T>(expresion).Configure(schema: schema);
 
-                Trace.WriteLine($"{sResult} vs SELECT COUNT(*) FROM {finalQuery(TableConfiguration)}{stringGroup}");
+                var sResult = oQuery.GroupBy(GetGroup()).Count();
+
+                Trace.WriteLine($"{sResult} vs SELECT COUNT(*) FROM {finalQuery(oQuery.Configuration)}{stringGroup}");
 
 
-                Assert.IsTrue(sResult == $"SELECT COUNT(*) FROM {finalQuery(TableConfiguration)}{stringGroup}");
+                Assert.IsTrue(sResult == $"SELECT COUNT(*) FROM {finalQuery(oQuery.Configuration)}{stringGroup}");
 
             };
 
-            RunOperationTest(check, configuration);
+            RunOperationTest(check);
         }
 
 
         [TestMethod]
         public void Max()
         {
-            var configuration = new SqlClassConfiguration();
-            var TableConfiguration = new SqlCommandConfiguration<T> { Schema = schema };
-
 
             Action<IQuery> check = Parser =>
             {
-                var sResult = Parser.Query<T>(expresion).Configure(schema: schema).GroupBy(GetGroup()).Max(x => x.Id);
-                Assert.IsTrue(sResult == $"SELECT MAX(Id) FROM {finalQuery(TableConfiguration)}{stringGroup}");
+                var oQuery = Parser.Query<T>(expresion).Configure(schema: schema);
+
+                var sResult = oQuery.GroupBy(GetGroup()).Max(x => x.Id);
+                Assert.IsTrue(sResult == $"SELECT MAX(Id) FROM {finalQuery(oQuery.Configuration)}{stringGroup}");
             };
 
-            RunOperationTest(check, configuration);            
+            RunOperationTest(check);            
         }
 
         [TestMethod]
         public void Min()
         {
-            var configuration = new SqlClassConfiguration();
-            var TableConfiguration = new SqlCommandConfiguration<T> { Schema = schema };
-
 
             Action<IQuery> check = Parser =>
             {
-                var sResult = Parser.Query<T>(expresion).Configure(schema: schema).GroupBy(GetGroup()).Min(x => x.Id);
-                Assert.IsTrue(sResult == $"SELECT MIN(Id) FROM {finalQuery(TableConfiguration)}{stringGroup}");
+                var oQuery = Parser.Query<T>(expresion).Configure(schema: schema);
+
+                var sResult = oQuery.GroupBy(GetGroup()).Min(x => x.Id);
+                Assert.IsTrue(sResult == $"SELECT MIN(Id) FROM {finalQuery(oQuery.Configuration)}{stringGroup}");
             };
 
-            RunOperationTest(check, configuration);    
+            RunOperationTest(check);    
         }
 
         [TestMethod]
         public void Sum()
         {
-            var configuration = new SqlClassConfiguration();
-            var TableConfiguration = new SqlCommandConfiguration<T> { Schema = schema };
-
-
             Action<IQuery> check = Parser =>
             {
-                var sResult = Parser.Query<T>(expresion).Configure(schema: schema).GroupBy(GetGroup()).Sum(x => x.Id);
-                Assert.IsTrue(sResult == $"SELECT SUM(Id) FROM {finalQuery(TableConfiguration)}{stringGroup}");
+                var oQuery = Parser.Query<T>(expresion).Configure(schema: schema);
+
+                var sResult = oQuery.GroupBy(GetGroup()).Sum(x => x.Id);
+                Assert.IsTrue(sResult == $"SELECT SUM(Id) FROM {finalQuery(oQuery.Configuration)}{stringGroup}");
             };
 
-            RunOperationTest(check, configuration);
+            RunOperationTest(check);
         }
 
         [TestMethod]
         public void Avg()
         {
-            var configuration = new SqlClassConfiguration();
-            var TableConfiguration = new SqlCommandConfiguration<T> { Schema = schema };
-
-
-            var sResult2 = new SqlParse().Query<T>(expresion).Configure(schema: schema).GroupBy(GetGroup()).Avg(x => x.Id);
-
-
             Action<IQuery> check = Parser =>
             {
+                var oQuery = Parser.Query<T>(expresion).Configure(schema: schema);
 
-                var sResult = Parser.Query<T>(expresion).Configure(schema: schema).GroupBy(GetGroup()).Avg(x => x.Id);
-                var sString = $"SELECT AVG(Id) FROM {finalQuery(TableConfiguration)}{stringGroup}";
+                var sResult = oQuery.GroupBy(GetGroup()).Avg(x => x.Id);
+                var sString = $"SELECT AVG(Id) FROM {finalQuery(oQuery.Configuration)}{stringGroup}";
                 Trace.WriteLine($"{sResult} -vs- {sString}");
 
                 Assert.IsTrue(sResult == sString);
 
             };
 
-            RunOperationTest(check, configuration);
+            RunOperationTest(check);
         }
 
 
         [TestMethod]
         public void Select()
         {
-            var configuration = new SqlClassConfiguration();
-            var TableConfiguration = new SqlCommandConfiguration<T> { Schema = schema };
-
-
             Action<IQuery> check = Parser =>
             {
-                var sResult = Parser.Query<T>(expresion).Configure(schema: schema).OrderBy(GetOrder()).Select();
+                var oQuery = Parser.Query<T>(expresion).Configure(schema: schema);
 
-                Assert.IsTrue(sResult == $"SELECT {selection(configuration)} FROM {finalQuery(TableConfiguration)}{stringOrder}");
+                var sResult = oQuery.OrderBy(GetOrder()).Select();
+
+                Assert.IsTrue(sResult == $"SELECT {selection(Parser.ClassConfiguration)} FROM {finalQuery(oQuery.Configuration)}{stringOrder}");
             };
 
-            RunOperationTest(check, configuration);
+            RunOperationTest(check);
         }
 
         [TestMethod]
         public void Delete()
         {
-            var configuration = new SqlClassConfiguration();
-            var TableConfiguration = new SqlCommandConfiguration<T> { Schema = schema };
-
 
             Action<ICommand> check = Parser =>
             {
-                var sResult = Parser.Command<T>(expresion).Configure(schema: schema).Delete();
+                var oQuery = Parser.Command<T>(expresion).Configure(schema: schema);
 
-                Assert.IsTrue(sResult == $"DELETE FROM {table(TableConfiguration)}{stringExpression}");
+                var sResult = oQuery.Delete();
+
+                Assert.IsTrue(sResult == $"DELETE FROM {table(oQuery.Configuration)}{stringExpression}");
             };
 
-            RunOperationTest(check, configuration);
+            RunOperationTest(check);
         }
 
         [TestMethod]
         public void UpdatePartial()
         {
-
-            var configuration = new SqlClassConfiguration();
-            var TableConfiguration = new SqlCommandConfiguration<T> { Schema = schema };
-
-
             Action<ICommand> check = Parser =>
             {
-                var sResult = Parser.Command<T>(expresion).Configure(schema: schema)
-                                    .Update(new Dictionary<string, string>(
+                var oQuery = Parser.Command<T>(expresion).Configure(schema: schema);
+                var sString = $"UPDATE {table(oQuery.Configuration)} SET Id = 3{stringExpression}";
+                var sResult = oQuery.Update(new Dictionary<string, string>(
                                         new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("Id", "3") })
                                      );
+                Trace.WriteLine($"{sResult} -vs- {sString}");
 
-                Assert.IsTrue(sResult == $"UPDATE {table(TableConfiguration)} SET Id = 3{stringExpression}");
+                Assert.IsTrue(sResult == sString);
             };
 
-            RunOperationTest(check, configuration);            
+            RunOperationTest(check);            
         }
     }
 

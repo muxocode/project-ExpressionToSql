@@ -10,7 +10,7 @@ namespace ExpressionToSQL.common
     /// </summary>
     public interface ISqlQuery<T>: ISqlQueryOrdered<T>, ISqlQueryGrouped<T>
     {
-        ITableConfiguration Configuration { get; }
+        IQueryConfiguration Configuration { get; }
         ISqlQuery<T> Configure(
             string primaryKeyTable = null,
             string tableName = null,

@@ -5,38 +5,55 @@ using System.Linq;
 using ExpressionToSQL.common;
 using ExpressionToSQL.common.configuration;
 using ExpressionToSQL.configuration;
-using ExpressionToSQL.util;
+using ExpressionToSQL.consultant;
+using ExpressionToSql.consultant;
 
 namespace ExpressionToSQL
 {
-    public class SqlParse : IQuery, ICommand
+    public class SqlParse: IQuery, ICommand
     {
-        protected SqlClassConfiguration ClassConfiguration { get; private set; }
 
-        IClassConfiguration IOperation<IQuery>.ClassConfiguration => ClassConfiguration;
-
-        IClassConfiguration IOperation<ICommand>.ClassConfiguration => ClassConfiguration;
-
-        public ISqlConsultant SqlConsultant { get; set; } = new SqlServerConsultant();
-
-        public SqlParse(SqlClassConfiguration configuration = null)
+        private class Configuration : IClassConfiguration
         {
-            this.ClassConfiguration = configuration ?? new SqlClassConfiguration();
+            public bool FieldsInclude { get; set; }
+
+            public bool PropsInclude { get; set; }
+        }
+
+        public SqlType SqlType;
+        public IClassConfiguration ClassConfiguration { get; private set; }
+
+        public SqlParse(IClassConfiguration configuration = null)
+        {
+            Init(configuration, SqlType.SqlServer);
+        }
+        public SqlParse(SqlType SqlType, IClassConfiguration configuration = null)
+        {
+            Init(configuration, SqlType.SqlServer);
+        }
+
+        private void Init(IClassConfiguration configuration, SqlType SqlType)
+        {
+            this.ClassConfiguration = configuration ?? new SqlConfiguration<object>();
+            this.SqlType = SqlType;
         }
 
         public ISqlCommand<T> Command<T>(Expression<Func<T, bool>> expression = null)
         {
-            return new SqlGenerator<T>(this.SqlConsultant,this.ClassConfiguration, expression != null ? new Expression<Func<T, bool>>[] { expression } : null);
+            var oConf = new SqlConfiguration<T>() { FieldsInclude = this.ClassConfiguration.FieldsInclude, PropsInclude = this.ClassConfiguration.PropsInclude };
+            return new SqlGenerator<T>(this.SqlType,oConf, expression != null ? new Expression<Func<T, bool>>[] { expression } : null);
         }
 
         public ISqlQuery<T> Query<T>(Expression<Func<T, bool>> expression = null)
         {
-            return new SqlGenerator<T>(this.SqlConsultant, this.ClassConfiguration, expression != null ? new Expression<Func<T, bool>>[] { expression } : null);
+            var oConf = new SqlConfiguration<T>() { FieldsInclude = this.ClassConfiguration.FieldsInclude, PropsInclude = this.ClassConfiguration.PropsInclude };
+
+            return new SqlGenerator<T>(this.SqlType, oConf, expression != null ? new Expression<Func<T, bool>>[] { expression } : null);
         }
 
         public SqlParse Configure(bool? fieldsInclude = null, bool? propsInclude = null)
         {
-            var oConf = this.ClassConfiguration.Clone();
+            var oConf = new Configuration();
 
             oConf.FieldsInclude = fieldsInclude.GetValueOrDefault(oConf.FieldsInclude);
 

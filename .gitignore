@@ -20,3 +20,6 @@
 /ExpressionToSql.sql.test/obj
 /ExpressionToSql.sql.test/sqlServer/db
 /.vs/ExpressionToSql/DesignTimeBuild
+/ExpressionToSql.consultant/bin/Debug/netstandard2.0
+/ExpressionToSql.consultant/obj
+/ExpressionToSql/bin/Debug

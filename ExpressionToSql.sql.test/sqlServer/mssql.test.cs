@@ -248,6 +248,13 @@ namespace ExpressionToSql.sql.test
                 oPaciente = dbConnection.Query<Paciente>(sQuery).SingleOrDefault();
                 Assert.IsTrue(oPaciente.Id == 11);
 
+                //LIST
+                var aListaNum = new List<long>() { 1, 2, 3, 4, 5 };
+                sQuery = oQuery.Where(x => aListaNum.Contains(x.Id)).Select();
+                var aListaPac = dbConnection.Query<Paciente>(sQuery);
+                Assert.IsTrue(aListaPac.Count() == 5);
+
+
                 //BORRAMOS LA TABLA
                 sQuery = oCommand.Delete();
                 dbConnection.Execute(sQuery);
@@ -318,6 +325,11 @@ namespace ExpressionToSql.sql.test
                 sQuery = oQuery.Where(x => x.Id > 10).OrderBy(x => x.Nombre).Fisrt();
                 oPaciente = dbConnection.Query<Paciente>(sQuery).SingleOrDefault();
                 Assert.IsTrue(oPaciente == null);
+
+                //LIST
+                sQuery = oQuery.Where(x => aListaNum.Contains(x.Id)).Select();
+                aListaPac = dbConnection.Query<Paciente>(sQuery);
+                Assert.IsTrue(aListaPac.Count() == 0);
 
             }
         }
