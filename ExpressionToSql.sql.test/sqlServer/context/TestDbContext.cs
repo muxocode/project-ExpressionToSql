@@ -1,4 +1,4 @@
-﻿using ExpresionToSql.util.test.clases;
+﻿/*using ExpresionToSql.util.test.clases;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -36,3 +36,4 @@ namespace ExpressionToSql.sql.test.sqlServer.context
         }
     }
 }
+*/
